@@ -3,7 +3,7 @@
 Plugin Name: Anode Warning
 Plugin URI: https://agence-anode.fr/
 Description: Affiche un bandeau de maintenance pour avertir les administrateurs (frontend et backend).
-Version: 2.0
+Version: 2.1.0
 Author: Agence Anode
 Author URI: https://agence-anode.fr/
 License: GPLv2 or later
@@ -24,6 +24,7 @@ class Anode_Warning {
         add_action( 'wp_footer', array( $this, 'warning_text' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+        add_action( 'admin_head', array( $this, 'admin_menu_styles' ) );
         add_action( 'plugins_loaded', array( $this, 'detect_environment' ), 20 );
     }
 
@@ -42,6 +43,21 @@ class Anode_Warning {
             'anode_warning',
             array( $this, 'options_page' )
         );
+    }
+
+    public function admin_menu_styles() {
+        ?>
+        <style>
+            #adminmenu a[href*="page=anode_warning"] {
+                background: #6B54FF !important;
+                color: #fff !important;
+                border-radius: 4px;
+            }
+            #adminmenu a[href*="page=anode_warning"]:hover {
+                background: #5a45e0 !important;
+            }
+        </style>
+        <?php
     }
 
     public function enqueue_styles() {
