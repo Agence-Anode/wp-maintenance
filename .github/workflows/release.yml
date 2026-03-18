@@ -1,0 +1,37 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Vérifier la version du plugin
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          PLUGIN_VERSION=$(grep -oP 'Version:\s*\K[0-9.]+' anode-warning/anode-warning.php)
+          if [ "$TAG" != "$PLUGIN_VERSION" ]; then
+            echo "::error::Le tag ($TAG) ne correspond pas à la version du plugin ($PLUGIN_VERSION)"
+            exit 1
+          fi
+          echo "VERSION=$TAG" >> "$GITHUB_ENV"
+
+      - name: Créer le ZIP du plugin
+        run: zip -r anode-warning.zip anode-warning/
+
+      - name: Créer la release GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Anode Warning v${{ env.VERSION }}
+          generate_release_notes: true
+          files: anode-warning.zip
